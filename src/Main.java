@@ -1,4 +1,6 @@
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -8,7 +10,12 @@ public class Main {
         String Cname, Cdate, Cmemo;
         String none;
 
-        int number,index,len=0;
+        // DB (mysql)
+        String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
+        String user = "root";
+        String password = "leehm2292!"; // DB 비밀번호
+
+        int number,len=0,index=0;
 
         while(true){
             System.out.println("1. 등록"+"\n"+"2. 삭제"+"\n"+"3. 수정"+"\n"+"4. 목록 보기"+"\n"+"5. 나가기");
@@ -26,6 +33,7 @@ public class Main {
                 len++;
                 System.out.println("입력하신 값이 등록되었습니다.");
             }
+
             if(number == 2){ // 삭제
                 System.out.println("------------------------------------------------------------------");
                 for(int i=0;i<len;i++){
@@ -84,8 +92,6 @@ public class Main {
                     }
                 }
             }
-
-
         }
 
     }
