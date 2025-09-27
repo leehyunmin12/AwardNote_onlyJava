@@ -15,7 +15,7 @@ public class Main {
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
 
-        int number,len=0,index=0;
+        int number,len=0,index;
 
         while(true){
             System.out.println("1. 등록"+"\n"+"2. 삭제"+"\n"+"3. 수정"+"\n"+"4. 목록 보기"+"\n"+"5. 나가기");
