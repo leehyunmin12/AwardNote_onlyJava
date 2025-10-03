@@ -94,13 +94,7 @@ public class Main {
                 }
             }
         }
-//        String sql = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
-//        PreparedStatement pstmt = conn.prepareStatement(sql);
-//
-//        // 값 바인딩
-//        pstmt.setString(1, username);
-//        pstmt.setString(2, pwd);  // ⚠️ 실제로는 비밀번호를 해싱해야 함!
-//        pstmt.setString(3, email);
+
 
     }
 }
