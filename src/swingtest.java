@@ -1,31 +1,50 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
+import java.nio.Buffer;
 
 public class swingtest {
     public static void main(String[] args) {
-        JFrame frame = new JFrame("계산기");
-        JTextField input1 = new JTextField();
-        JTextField input2 = new JTextField();
-        JButton addBtn = new JButton("+");
-        JLabel result = new JLabel("결과");
+        JFrame frame = new JFrame("메모장");
+        JTextArea textArea = new JTextArea();
+        JScrollPane scroll = new JScrollPane(textArea);
 
-        addBtn.addActionListener(e -> {
-            try{
-                int a = Integer.parseInt(input1.getText());
-                int b = Integer.parseInt(input2.getText());
-                result.setText("결과: "+ (a+b));
-            } catch (NumberFormatException ex){
-                JOptionPane.showMessageDialog(frame, "숫자를 입력하세요!");
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("파일");
+        JMenuItem openItem = new JMenuItem("열기");
+        JMenuItem saveItem = new JMenuItem("저장");
+
+        // 파일 열기
+        openItem.addActionListener(e -> {
+            JFileChooser chooser = new JFileChooser();
+            if(chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION){
+                try (BufferedReader br = new BufferedReader(new FileReader(chooser.getSelectedFile()))){
+                    textArea.read(br, null);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
-        JPanel panel = new JPanel(new GridLayout(3,2,5,5));
-        panel.add(new JLabel("숫자1:")); panel.add(input1);
-        panel.add(new JLabel("숫자2:")); panel.add(input2);
-        panel.add(addBtn); panel.add(result);
+        // 파일 저장
+        saveItem.addActionListener(e -> {
+            JFileChooser chooser = new JFileChooser();
+            if(chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(chooser.getSelectedFile()))) {
+                    textArea.write(bw);
+                } catch (IOException ex){
+                    ex.printStackTrace();
+                }
+            }
+        });
 
-        frame.add(panel);
-        frame.setSize(300, 150);
+        fileMenu.add(openItem);
+        fileMenu.add(saveItem);
+        menuBar.add(fileMenu);
+
+        frame.setJMenuBar(menuBar);
+        frame.add(scroll, BorderLayout.CENTER);
+        frame.setSize(500, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
