@@ -1,60 +1,86 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 
+class Item {
+    String name;
+    boolean favorite;
+
+    Item(String name) {
+        this.name = name;
+        this.favorite = false;
+    }
+
+    @Override
+    public String toString() {
+        return (favorite ? "⭐ " : "☆ ") + name;
+    }
+}
+
 public class swingtest extends JFrame {
-    private ArrayList<String> favorites = new ArrayList<>();
-    private DefaultListModel<String> listModel = new DefaultListModel<>();
-    private JList<String> favoriteList = new JList<>(listModel);
-    private JTextField inputField = new JTextField(20);
-    private JButton addButton = new JButton("추가");
-    private JButton removeButton = new JButton("삭제");
+    private ArrayList<Item> items = new ArrayList<>();
+    private DefaultListModel<Item> listModel = new DefaultListModel<>();
+    private JList<Item> itemList = new JList<>(listModel);
+
+    private JButton toggleFavButton = new JButton("⭐ 즐겨찾기 토글");
+    private JButton showFavButton = new JButton("즐겨찾기만 보기");
+    private JButton showAllButton = new JButton("전체 보기");
 
     public swingtest() {
-        setTitle("즐겨찾기");
+        setTitle("즐겨찾기 리스트");
         setSize(400, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        // 상단: 입력창 + 추가 버튼
-        JPanel topPanel = new JPanel();
-        topPanel.add(inputField);
-        topPanel.add(addButton);
+        // 초기 데이터
+        items.add(new Item("구글"));
+        items.add(new Item("네이버"));
+        items.add(new Item("유튜브"));
+        items.add(new Item("깃허브"));
 
-        // 중앙: 리스트
-        JScrollPane scrollPane = new JScrollPane(favoriteList);
+        refreshList(items);
 
-        // 하단: 삭제 버튼
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.add(removeButton);
+        // UI 배치
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(toggleFavButton);
+        buttonPanel.add(showFavButton);
+        buttonPanel.add(showAllButton);
 
-        // 레이아웃
-        add(topPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
+        add(new JScrollPane(itemList), BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
 
-        // 이벤트 처리
-        addButton.addActionListener(e -> {
-            String item = inputField.getText().trim();
-            if (!item.isEmpty() && !favorites.contains(item)) {
-                favorites.add(item);
-                listModel.addElement(item);
-                inputField.setText("");
+        // ⭐ 토글 이벤트
+        toggleFavButton.addActionListener(e -> {
+            int index = itemList.getSelectedIndex();
+            if (index != -1) {
+                Item item = listModel.get(index);
+                item.favorite = !item.favorite;
+                itemList.repaint(); // 리스트 다시 그리기
             }
         });
 
-        removeButton.addActionListener(e -> {
-            int index = favoriteList.getSelectedIndex();
-            if (index != -1) {
-                favorites.remove(index);
-                listModel.remove(index);
+        // 즐겨찾기만 보기
+        showFavButton.addActionListener(e -> {
+            ArrayList<Item> favs = new ArrayList<>();
+            for (Item i : items) {
+                if (i.favorite) favs.add(i);
             }
+            refreshList(favs);
+        });
+
+        // 전체 보기
+        showAllButton.addActionListener(e -> {
+            refreshList(items);
         });
     }
 
+    private void refreshList(ArrayList<Item> list) {
+        listModel.clear();
+        for (Item i : list) {
+            listModel.addElement(i);
+        }
+    }
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new swingtest().setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new swingtest().setVisible(true));
     }
 }
