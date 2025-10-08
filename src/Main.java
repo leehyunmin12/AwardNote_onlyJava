@@ -133,7 +133,7 @@ public class Main {
 
     public static void add(Connection connection, Scanner scan, int len) throws SQLException {
         String none;
-        String sql = "INSERT INTO list (Cname, Cdate, Cmemo) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO list (Cname, Cdate, Cmemo, Cfavorite) VALUES (?, ?, ?, 0)";
         PreparedStatement pst = connection.prepareStatement(sql);
 
         none = scan.nextLine();
