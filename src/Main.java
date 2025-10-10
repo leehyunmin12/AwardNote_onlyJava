@@ -181,7 +181,7 @@ public class Main {
 
         String sql2 = "UPDATE list SET Cname=?, Cdate=?, Cmemo=? WHERE id=?";
         try (PreparedStatement pst = connection.prepareStatement(sql2)) {
-            System.out.println(nCn+nCd+nCm);
+            ///System.out.println(nCn+nCd+nCm);
             pst.setString(1, nCn);
             pst.setString(2, nCd);
             pst.setString(3, nCm);
