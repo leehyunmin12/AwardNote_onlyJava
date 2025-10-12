@@ -52,7 +52,7 @@ public class Main {
 //                            System.out.println("------------------------------------------------------------------");
 //                        }
 //                    }
-                    show(connection);
+                    show(connection, 1);
                     delete(scan, connection);
                 }
 
@@ -85,7 +85,7 @@ public class Main {
                     Cmemo = scan.nextLine();
                     arr[n][2] = Cmemo;
                      */
-                    show(connection);
+                    show(connection, 1);
                     update(scan, connection);
                 }
 
@@ -100,7 +100,27 @@ public class Main {
                             System.out.println("------------------------------------------------------------------");
                         }
                     } */
-                    show(connection);
+                    show(connection, 1);
+                    System.out.print("즐겨찾기를 설정하고 싶으면 1" + "\n" + "즐겨찾기 목록을 보고싶다면 2" + "\n" + "아니면 3을 입력하세요");
+                    number = scan.nextInt();
+                    if(number == 1){
+                        System.out.println("즐겨찾기 할 번호를 입력하세요.");
+                        int n = scan.nextInt();
+
+                        String sql = "UPDATE list SET Cfavorite=true WHERE id=?";
+                        try(PreparedStatement pst = connection.prepareStatement(sql)) {
+                            pst.setInt(1, n);
+
+                            pst.executeUpdate();
+                            System.out.println("즐겨찾기가 완료되었습니다.");
+                        } catch (Exception e){
+                            e.getStackTrace();
+                        }
+
+                    }
+                    if(number == 2) {
+                         show(connection, 2);
+                    }
                 }
 
             }
@@ -110,23 +130,45 @@ public class Main {
 
     }
 
-    public static void show(Connection connection) {
-        String sql = "SELECT * FROM list"; // 쿼리문
-        try (PreparedStatement pst = connection.prepareStatement(sql);
-             ResultSet rs = pst.executeQuery()) {
+    public static void show(Connection connection, int aof) {
+        if(aof == 1){
+            String sql = "SELECT * FROM list"; // 쿼리문
+            try (PreparedStatement pst = connection.prepareStatement(sql);
+                 ResultSet rs = pst.executeQuery()) {
 
-            while(rs.next()) {
-                int id = rs.getInt("id");
-                String Cn = rs.getString("Cname");
-                String Cd = rs.getString("Cdate");
-                String Cm = rs.getString("Cmemo");
-                System.out.println(id);
-                System.out.println("자격증(상장) 명 : " + Cn);
-                System.out.println("취득 날짜 : " + Cd);
-                System.out.println("메모 : " + Cm);
+                while(rs.next()) {
+                    int id = rs.getInt("id");
+                    String Cn = rs.getString("Cname");
+                    String Cd = rs.getString("Cdate");
+                    String Cm = rs.getString("Cmemo");
+                    System.out.println(id);
+                    System.out.println("자격증(상장) 명 : " + Cn);
+                    System.out.println("취득 날짜 : " + Cd);
+                    System.out.println("메모 : " + Cm);
+                }
+            } catch (Exception e) {
+                e.getStackTrace();
             }
-        } catch (Exception e) {
-            e.getStackTrace();
+        }
+        if(aof == 2){
+            String sql2 = "SELECT * FROM list WHERE Cfavorite=true";
+            try(PreparedStatement pst2 = connection.prepareStatement(sql2);
+                ResultSet rs = pst2.executeQuery()){
+
+                while(rs.next()){
+                    int id = rs.getInt("id");
+                    String Cn = rs.getString("Cname");
+                    String Cd = rs.getString("Cdate");
+                    String Cm = rs.getString("Cmemo");
+                    System.out.println(id);
+                    System.out.println("자격증(상장) 명 : " + Cn);
+                    System.out.println("취득 날짜 : " + Cd);
+                    System.out.println("메모 : " + Cm);
+                }
+
+            } catch (Exception e){
+                e.getStackTrace();
+            }
         }
         System.out.println("------------------------------------------------------------------");
     }
