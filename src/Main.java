@@ -48,6 +48,12 @@ public class Main {
 
             }
             if (us == 2){
+                System.out.print("아이디를 입력하세요 : ");
+                String id = scan.nextLine();
+                System.out.print("비밀번호를 입력하시오 : ");
+                String pw = scan.nextLine();
+
+
 
             }
 
