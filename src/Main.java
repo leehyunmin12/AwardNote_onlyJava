@@ -13,14 +13,48 @@ public class Main {
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
 
-        int number,len=0,index;
+        int number,len=0,index,user_id=0;
 
         try {
             // JDBC 드라이버 로드
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, password);
+
+            System.out.println("1. 회원가입 \n2. 로그인");
+            int us = scan.nextInt();
+            if (us == 1){
+                String sql = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
+                try (PreparedStatement pst = connection.prepareStatement(sql)) {
+
+                    System.out.print("이메일을 입력하세요 : ");
+                    none = scan.nextLine();
+                    String email = scan.nextLine();
+                    System.out.print("아이디를 입력하세요 : ");
+                    String id = scan.nextLine();
+                    System.out.print("비밀번호를 입력하세요 : ");
+                    String pw = scan.nextLine();
+
+                    pst.setString(1, id);
+                    pst.setString(2, pw);
+                    pst.setString(3, email);
+
+                    pst.executeUpdate();
+                    System.out.println("회원가입이 완료되었습니다.");
+                    us=2;
+                } catch (Exception e){
+                    System.out.println("회원가입을 실패하였습니다.");
+                    e.getStackTrace();
+                }
+
+            }
+            if (us == 2){
+
+            }
+
+
+
             while (true) {
-                System.out.println("1. 등록" + "\n" + "2. 삭제" + "\n" + "3. 수정" + "\n" + "4. 목록 보기" + "\n" + "5. 나가기");
+                System.out.println("1. 등록\n 2. 삭제\n 3. 수정\n 4. 목록 보기\n 5. 나가기");
                 number = scan.nextInt();
                 if (number == 5) break; // 나가기
 
@@ -122,7 +156,6 @@ public class Main {
                          show(connection, 2);
                     }
                 }
-
             }
         } catch (Exception e) {
             e.getStackTrace();
