@@ -13,7 +13,7 @@ public class Main {
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
 
-        int number, len=0, user_id=0;
+        int number, len = 0, user_id = 0;
 
         try {
             // JDBC 드라이버 로드
@@ -63,9 +63,8 @@ public class Main {
                         ResultSet rs = pst.executeQuery();
 
                         if (!rs.next()) {
-                            System.out.print("입력하신 아이디는 존재하지 않습니다.");
+                            System.out.println("입력하신 아이디는 존재하지 않습니다.");
                         } else {
-                            System.out.println(rs.getString("password"));
                             if (pw.equals(rs.getString("password"))) {
                                 user_id = rs.getInt("id");
                                 System.out.println("로그인이 완료되었습니다.");
@@ -73,13 +72,13 @@ public class Main {
                             } else {
                                 System.out.println("비밀번호가 알맞지 않습니다.");
                             }
-
                         }
 
                     } catch (Exception e) {
                         System.out.println(e);
                         e.getStackTrace();
                     }
+
                     us = 3;
                 }
             }
@@ -102,7 +101,7 @@ public class Main {
 //                    arr[len][2] = scan.nextLine();
 
                     // DB에 저장
-                    add(connection, scan, len);
+                    add(connection, scan, len, user_id);
                 }
 
                 if (number == 2) { // 삭제
@@ -117,7 +116,7 @@ public class Main {
 //                            System.out.println("------------------------------------------------------------------");
 //                        }
 //                    }
-                    show(connection, 1);
+                    show(connection, 1, user_id);
                     delete(scan, connection);
                 }
 
@@ -150,7 +149,7 @@ public class Main {
                     Cmemo = scan.nextLine();
                     arr[n][2] = Cmemo;
                      */
-                    show(connection, 1);
+                    show(connection, 1, user_id);
                     update(scan, connection);
                 }
 
@@ -165,7 +164,7 @@ public class Main {
                             System.out.println("------------------------------------------------------------------");
                         }
                     } */
-                    show(connection, 1);
+                    show(connection, 1, user_id);
                     System.out.print("즐겨찾기를 설정하고 싶으면 1" + "\n" + "즐겨찾기 목록을 보고싶다면 2" + "\n" + "아니면 3을 입력하세요");
                     number = scan.nextInt();
                     if(number == 1){
@@ -184,7 +183,7 @@ public class Main {
 
                     }
                     if(number == 2) {
-                         show(connection, 2);
+                         show(connection, 2, user_id);
                     }
                 }
             }
@@ -194,7 +193,7 @@ public class Main {
 
     }
 
-    public static void show(Connection connection, int aof) {
+    public static void show(Connection connection, int aof, int user_id) {
         if(aof == 1){
             String sql = "SELECT * FROM list"; // 쿼리문
             try (PreparedStatement pst = connection.prepareStatement(sql);
@@ -215,7 +214,7 @@ public class Main {
             }
         }
         if(aof == 2){
-            String sql2 = "SELECT * FROM list WHERE Cfavorite=true";
+            String sql2 = "SELECT * FROM list WHERE Cfavorite = true";
             try(PreparedStatement pst2 = connection.prepareStatement(sql2);
                 ResultSet rs = pst2.executeQuery()){
 
@@ -237,7 +236,7 @@ public class Main {
         System.out.println("------------------------------------------------------------------");
     }
 
-    public static void add(Connection connection, Scanner scan, int len) throws SQLException {
+    public static void add(Connection connection, Scanner scan, int len, int user_id) throws SQLException {
         String none;
         String sql = "INSERT INTO list (Cname, Cdate, Cmemo, Cfavorite) VALUES (?, ?, ?, 0)";
         PreparedStatement pst = connection.prepareStatement(sql);
