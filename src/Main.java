@@ -13,7 +13,7 @@ public class Main {
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
 
-        int number,len=0,index,user_id=0;
+        int number, len=0, user_id=0;
 
         try {
             // JDBC 드라이버 로드
@@ -22,45 +22,70 @@ public class Main {
 
             System.out.println("1. 회원가입 \n2. 로그인");
             int us = scan.nextInt();
-            if (us == 1){
-                String sql = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
-                try (PreparedStatement pst = connection.prepareStatement(sql)) {
+            while(true) {
+                if (us == 1) {
+                    String sql = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
+                    try (PreparedStatement pst = connection.prepareStatement(sql);) {
 
-                    System.out.print("이메일을 입력하세요 : ");
-                    none = scan.nextLine();
-                    String email = scan.nextLine();
-                    System.out.print("아이디를 입력하세요 : ");
-                    String id = scan.nextLine();
-                    System.out.print("비밀번호를 입력하세요 : ");
-                    String pw = scan.nextLine();
+                        System.out.print("이메일을 입력하세요 : ");
+                        none = scan.nextLine();
+                        String email = scan.nextLine();
+                        System.out.print("아이디를 입력하세요 : ");
+                        String id = scan.nextLine();
+                        System.out.print("비밀번호를 입력하세요 : ");
+                        String pw = scan.nextLine();
 
-                    pst.setString(1, id);
-                    pst.setString(2, pw);
-                    pst.setString(3, email);
+                        pst.setString(1, id);
+                        pst.setString(2, pw);
+                        pst.setString(3, email);
 
-                    pst.executeUpdate();
-                    System.out.println("회원가입이 완료되었습니다.");
-                    us=2;
-                } catch (Exception e){
-                    System.out.println("회원가입을 실패하였습니다.");
-                    e.getStackTrace();
+                        pst.executeUpdate();
+                        System.out.println("회원가입이 완료되었습니다.");
+                        us = 3;
+                    } catch (Exception e) {
+                        System.out.println("회원가입을 실패하였습니다.");
+                        e.getStackTrace();
+                    }
                 }
 
+                if (us == 2 || us == 3) {
+                    String sql = "SELECT * FROM login WHERE username = ?";
+
+                    if (us == 2) none = scan.nextLine();
+                    System.out.print("아이디를 입력하세요 : ");
+                    String id = scan.nextLine();
+                    System.out.print("비밀번호를 입력하시오 : ");
+                    String pw = scan.nextLine();
+
+                    try (PreparedStatement pst = connection.prepareStatement(sql)) {
+
+                        pst.setString(1, id);
+                        ResultSet rs = pst.executeQuery();
+
+                        if (!rs.next()) {
+                            System.out.print("입력하신 아이디는 존재하지 않습니다.");
+                        } else {
+                            System.out.println(rs.getString("password"));
+                            if (pw.equals(rs.getString("password"))) {
+                                user_id = rs.getInt("id");
+                                System.out.println("로그인이 완료되었습니다.");
+                                break;
+                            } else {
+                                System.out.println("비밀번호가 알맞지 않습니다.");
+                            }
+
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println(e);
+                        e.getStackTrace();
+                    }
+                    us = 3;
+                }
             }
-            if (us == 2){
-                System.out.print("아이디를 입력하세요 : ");
-                String id = scan.nextLine();
-                System.out.print("비밀번호를 입력하시오 : ");
-                String pw = scan.nextLine();
-
-
-
-            }
-
-
 
             while (true) {
-                System.out.println("1. 등록\n 2. 삭제\n 3. 수정\n 4. 목록 보기\n 5. 나가기");
+                System.out.println("1. 등록\n2. 삭제\n3. 수정\n4. 목록 보기\n5. 나가기");
                 number = scan.nextInt();
                 if (number == 5) break; // 나가기
 
