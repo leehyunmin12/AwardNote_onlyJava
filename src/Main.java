@@ -20,12 +20,14 @@ public class Main {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, password);
 
-            System.out.println("1. 회원가입 \n2. 로그인");
+            System.out.println("1. 회원가입\n2. 로그인");
             int us = scan.nextInt();
             while(true) {
                 if (us == 1) {
                     String sql = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
-                    try (PreparedStatement pst = connection.prepareStatement(sql);) {
+                    String sql2 = "SELECT * FROM login WHERE username = ?";
+                    try (PreparedStatement pst = connection.prepareStatement(sql);
+                    PreparedStatement pst2 = connection.prepareStatement(sql2)) {
 
                         System.out.print("이메일을 입력하세요 : ");
                         none = scan.nextLine();
@@ -38,10 +40,17 @@ public class Main {
                         pst.setString(1, id);
                         pst.setString(2, pw);
                         pst.setString(3, email);
+                        pst2.setString(1, id);
 
-                        pst.executeUpdate();
-                        System.out.println("회원가입이 완료되었습니다.");
-                        us = 3;
+                        ResultSet rs = pst2.executeQuery();
+
+                        if (rs.next()) System.out.println("입력하신 회원은 이미 존재합니다.");
+                        else{
+                            System.out.println("회원가입이 완료되었습니다.");
+                            pst.executeUpdate();
+                            us = 3;
+                        }
+
                     } catch (Exception e) {
                         System.out.println("회원가입을 실패하였습니다.");
                         e.getStackTrace();
@@ -120,7 +129,7 @@ public class Main {
                     delete(scan, connection);
                 }
 
-                if (number == 3) {
+                if (number == 3) { // 수정
                     /*
                     System.out.println("------------------------------------------------------------------");
                     for (int i = 0; i < len; i++) {
@@ -165,7 +174,7 @@ public class Main {
                         }
                     } */
                     show(connection, 1, user_id);
-                    System.out.print("즐겨찾기를 설정하고 싶으면 1" + "\n" + "즐겨찾기 목록을 보고싶다면 2" + "\n" + "아니면 3을 입력하세요");
+                    System.out.println("즐겨찾기를 설정하고 싶으면 1\n즐겨찾기 목록을 보고싶다면 2\n아니면 3을 입력하세요");
                     number = scan.nextInt();
                     if(number == 1){
                         System.out.println("즐겨찾기 할 번호를 입력하세요.");
@@ -194,8 +203,9 @@ public class Main {
     }
 
     public static void show(Connection connection, int aof, int user_id) {
+        System.out.println("------------------------------------------------------------------");
         if(aof == 1){
-            String sql = "SELECT * FROM list"; // 쿼리문
+            String sql = "SELECT * FROM list WHERE user_id = "+user_id; // 쿼리문
             try (PreparedStatement pst = connection.prepareStatement(sql);
                  ResultSet rs = pst.executeQuery()) {
 
@@ -214,7 +224,7 @@ public class Main {
             }
         }
         if(aof == 2){
-            String sql2 = "SELECT * FROM list WHERE Cfavorite = true";
+            String sql2 = "SELECT * FROM list WHERE Cfavorite = true and user_id = "+user_id;
             try(PreparedStatement pst2 = connection.prepareStatement(sql2);
                 ResultSet rs = pst2.executeQuery()){
 
@@ -238,7 +248,7 @@ public class Main {
 
     public static void add(Connection connection, Scanner scan, int len, int user_id) throws SQLException {
         String none;
-        String sql = "INSERT INTO list (Cname, Cdate, Cmemo, Cfavorite) VALUES (?, ?, ?, 0)";
+        String sql = "INSERT INTO list (Cname, Cdate, Cmemo, Cfavorite, user_id) VALUES (?, ?, ?, 0, ?)";
         PreparedStatement pst = connection.prepareStatement(sql);
 
         none = scan.nextLine();
@@ -253,11 +263,13 @@ public class Main {
         pst.setString(1, Cn);
         pst.setString(2, Cd);
         pst.setString(3, Cm);
+        pst.setInt(4, user_id);
 
         pst.executeUpdate(); // 실행
 
         System.out.println("입력하신 값이 등록되었습니다.");
     }
+
     public static void delete(Scanner scan, Connection connection){
         System.out.println("삭제할 번호를 입력하시오.");
         int n = scan.nextInt();
@@ -272,6 +284,7 @@ public class Main {
 
         System.out.println("입력한 번호의 값이 삭제되었습니다.");
     }
+
     public static void update(Scanner scan, Connection connection) {
         String none;
         System.out.print("수정할 번호를 입력하시오. ");
