@@ -13,7 +13,7 @@ public class Main {
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
 
-        int number, len = 0, user_id = 0;
+        int number, user_id = 0;
 
         try {
             // JDBC 드라이버 로드
@@ -110,7 +110,7 @@ public class Main {
 //                    arr[len][2] = scan.nextLine();
 
                     // DB에 저장
-                    add(connection, scan, len, user_id);
+                    add(connection, scan, user_id);
                 }
 
                 if (number == 2) { // 삭제
@@ -246,7 +246,7 @@ public class Main {
         System.out.println("------------------------------------------------------------------");
     }
 
-    public static void add(Connection connection, Scanner scan, int len, int user_id) throws SQLException {
+    public static void add(Connection connection, Scanner scan, int user_id) throws SQLException {
         String none;
         String sql = "INSERT INTO list (Cname, Cdate, Cmemo, Cfavorite, user_id) VALUES (?, ?, ?, 0, ?)";
         PreparedStatement pst = connection.prepareStatement(sql);
