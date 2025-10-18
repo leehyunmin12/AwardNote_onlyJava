@@ -6,6 +6,7 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         String none;
 
+
         // DB (mysql)
         String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
         String user = "root";
@@ -25,7 +26,7 @@ public class Main {
                     String Isql = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
                     String Ssql = "SELECT * FROM login WHERE username = ?";
                     try (PreparedStatement pst = connection.prepareStatement(Isql);
-                    PreparedStatement pst2 = connection.prepareStatement(Ssql)) {
+                         PreparedStatement pst2 = connection.prepareStatement(Ssql)) {
 
                         System.out.print("이메일을 입력하세요 : ");
                         none = scan.nextLine();
@@ -43,7 +44,7 @@ public class Main {
                         ResultSet rs = pst2.executeQuery();
 
                         if (rs.next()) System.out.println("입력하신 회원은 이미 존재합니다.");
-                        else{
+                        else {
                             System.out.println("회원가입이 완료되었습니다.");
                             pst.executeUpdate();
                             us = 3;
@@ -114,30 +115,29 @@ public class Main {
                     show(connection, 1, user_id);
                     System.out.println("즐겨찾기를 설정하고 싶으면 1\n즐겨찾기 목록을 보고싶다면 2\n아니면 3을 입력하세요");
                     number = scan.nextInt();
-                    if(number == 1){
-                        System.out.println("즐겨찾기 할 번호를 입력하세요.");
-                        int n = scan.nextInt();
-
-                        String Usql = "UPDATE list SET Cfavorite=true WHERE id=?";
-                        try(PreparedStatement pst = connection.prepareStatement(Usql)) {
-                            pst.setInt(1, n);
-
-                            pst.executeUpdate();
-                            System.out.println("즐겨찾기가 완료되었습니다.");
-                        } catch (Exception e){
-                            e.getStackTrace();
-                        }
-
-                    }
-                    if(number == 2) {
-                         show(connection, 2, user_id);
-                    }
+                    if(number == 1) addFavorite(scan, connection);
+                    if(number == 2) show(connection, 2, user_id);
                 }
             }
         } catch (Exception e) {
             e.getStackTrace();
         }
 
+    }
+
+    private static void addFavorite(Scanner scan, Connection connection) {
+        System.out.println("즐겨찾기 할 번호를 입력하세요.");
+        int n = scan.nextInt();
+
+        String Usql = "UPDATE list SET Cfavorite=true WHERE id=?";
+        try(PreparedStatement pst = connection.prepareStatement(Usql)) {
+            pst.setInt(1, n);
+
+            pst.executeUpdate();
+            System.out.println("즐겨찾기가 완료되었습니다.");
+        } catch (Exception e){
+            e.getStackTrace();
+        }
     }
 
     public static void show(Connection connection, int aof, int user_id) {
