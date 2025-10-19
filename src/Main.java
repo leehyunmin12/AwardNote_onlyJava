@@ -6,7 +6,6 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         String none;
 
-
         // DB (mysql)
         String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
         String user = "root";
@@ -32,22 +31,22 @@ public class Main {
                         none = scan.nextLine();
                         String email = scan.nextLine();
                         System.out.print("아이디를 입력하세요 : ");
-                        String id = scan.nextLine();
+                        String username = scan.nextLine();
                         System.out.print("비밀번호를 입력하세요 : ");
                         String pw = scan.nextLine();
 
-                        pst.setString(1, id);
+                        pst.setString(1, username);
                         pst.setString(2, pw);
                         pst.setString(3, email);
-                        pst2.setString(1, id);
+                        pst2.setString(1, username);
 
                         ResultSet rs = pst2.executeQuery();
 
                         if (rs.next()) System.out.println("입력하신 회원은 이미 존재합니다.");
                         else {
-                            System.out.println("회원가입이 완료되었습니다.");
                             pst.executeUpdate();
                             us = 3;
+                            System.out.println("회원가입이 완료되었습니다.");
                         }
 
                     } catch (Exception e) {
@@ -61,13 +60,13 @@ public class Main {
 
                     if (us == 2) none = scan.nextLine();
                     System.out.print("아이디를 입력하세요 : ");
-                    String id = scan.nextLine();
+                    String username = scan.nextLine();
                     System.out.print("비밀번호를 입력하시오 : ");
                     String pw = scan.nextLine();
 
                     try (PreparedStatement pst = connection.prepareStatement(Ssql)) {
 
-                        pst.setString(1, id);
+                        pst.setString(1, username);
                         ResultSet rs = pst.executeQuery();
 
                         if (!rs.next()) {
@@ -76,6 +75,7 @@ public class Main {
                             if (pw.equals(rs.getString("password"))) {
                                 user_id = rs.getInt("id");
                                 System.out.println("로그인이 완료되었습니다.");
+                                User user1 = new User(rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getString("email"));
                                 break;
                             } else {
                                 System.out.println("비밀번호가 알맞지 않습니다.");
@@ -111,7 +111,6 @@ public class Main {
                 }
 
                 if (number == 4) { // 목록 보기
-                    System.out.println("------------------------------------------------------------------");
                     show(connection, 1, user_id);
                     System.out.println("즐겨찾기를 설정하고 싶으면 1\n즐겨찾기 목록을 보고싶다면 2\n아니면 3을 입력하세요");
                     number = scan.nextInt();
