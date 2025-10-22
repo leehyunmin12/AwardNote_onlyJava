@@ -4,14 +4,14 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        String none;
+        String space;
 
         // DB (mysql)
         String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
 
-        int number, user_id = 0;
+        int choice, user_id = 0;
 
         try {
             // JDBC 드라이버 로드
@@ -19,33 +19,33 @@ public class Main {
             Connection connection = DriverManager.getConnection(url, user, password);
 
             System.out.println("1. 회원가입\n2. 로그인");
-            int us = scan.nextInt();
+            int choice = scan.nextInt();
             while(true) {
-                if (us == 1) {
-                    String Isql = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
-                    String Ssql = "SELECT * FROM login WHERE username = ?";
-                    try (PreparedStatement pst = connection.prepareStatement(Isql);
-                         PreparedStatement pst2 = connection.prepareStatement(Ssql)) {
+                if (choice == 1) {
+                    String insertionQuery = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
+                    String selectionQuery = "SELECT * FROM login WHERE username = ?";
+                    try (PreparedStatement insertionPst = connection.prepareStatement(insertionQuery);
+                         PreparedStatement selectionPst = connection.prepareStatement(selectionQuery)) {
 
                         System.out.print("이메일을 입력하세요 : ");
-                        none = scan.nextLine();
+                        space = scan.nextLine();
                         String email = scan.nextLine();
                         System.out.print("아이디를 입력하세요 : ");
                         String username = scan.nextLine();
                         System.out.print("비밀번호를 입력하세요 : ");
                         String pw = scan.nextLine();
 
-                        pst.setString(1, username);
-                        pst.setString(2, pw);
-                        pst.setString(3, email);
-                        pst2.setString(1, username);
+                        insertionPst.setString(1, username);
+                        insertionPst.setString(2, pw);
+                        insertionPst.setString(3, email);
+                        selectionPst.setString(1, username);
 
-                        ResultSet rs = pst2.executeQuery();
+                        ResultSet rs = selectionPst.executeQuery();
 
                         if (rs.next()) System.out.println("입력하신 회원은 이미 존재합니다.");
                         else {
-                            pst.executeUpdate();
-                            us = 3;
+                            insertionPst.executeUpdate();
+                            choice = 3;
                             System.out.println("회원가입이 완료되었습니다.");
                         }
 
@@ -55,16 +55,16 @@ public class Main {
                     }
                 }
 
-                if (us == 2 || us == 3) {
-                    String Ssql = "SELECT * FROM login WHERE username = ?";
+                if (choice == 2 || choice == 3) {
+                    String selectionQuery = "SELECT * FROM login WHERE username = ?";
 
-                    if (us == 2) none = scan.nextLine();
+                    if (choice == 2) space = scan.nextLine();
                     System.out.print("아이디를 입력하세요 : ");
                     String username = scan.nextLine();
                     System.out.print("비밀번호를 입력하시오 : ");
                     String pw = scan.nextLine();
 
-                    try (PreparedStatement pst = connection.prepareStatement(Ssql)) {
+                    try (PreparedStatement pst = connection.prepareStatement(selectionQuery)) {
 
                         pst.setString(1, username);
                         ResultSet rs = pst.executeQuery();
@@ -87,35 +87,35 @@ public class Main {
                         e.getStackTrace();
                     }
 
-                    us = 3;
+                    choice = 3;
                 }
             }
 
             while (true) {
                 System.out.println("1. 등록\n2. 삭제\n3. 수정\n4. 목록 보기\n5. 나가기");
-                number = scan.nextInt();
-                if (number == 5) break; // 나가기
+                choice = scan.nextInt();
+                if (choice == 5) break; // 나가기
 
-                if (number == 1) { // 등록
+                if (choice == 1) { // 등록
                     add(connection, scan, user_id);
                 }
 
-                if (number == 2) { // 삭제
+                if (choice == 2) { // 삭제
                     show(connection, 1, user_id);
                     delete(scan, connection);
                 }
 
-                if (number == 3) { // 수정
+                if (choice == 3) { // 수정
                     show(connection, 1, user_id);
                     update(scan, connection);
                 }
 
-                if (number == 4) { // 목록 보기
+                if (choice == 4) { // 목록 보기
                     show(connection, 1, user_id);
                     System.out.println("즐겨찾기를 설정하고 싶으면 1\n즐겨찾기 목록을 보고싶다면 2\n아니면 3을 입력하세요");
-                    number = scan.nextInt();
-                    if(number == 1) addFavorite(scan, connection);
-                    if(number == 2) show(connection, 2, user_id);
+                    choice = scan.nextInt();
+                    if(choice == 1) addFavorite(scan, connection);
+                    if(choice == 2) show(connection, 2, user_id);
                 }
             }
         } catch (Exception e) {
@@ -126,13 +126,13 @@ public class Main {
 
     private static void addFavorite(Scanner scan, Connection connection) {
         System.out.println("즐겨찾기 할 번호를 입력하세요.");
-        int n = scan.nextInt();
+        int idNumber = scan.nextInt();
 
-        String Usql = "UPDATE list SET Cfavorite=true WHERE id=?";
-        try(PreparedStatement pst = connection.prepareStatement(Usql)) {
-            pst.setInt(1, n);
+        String updateQuery = "UPDATE list SET Cfavorite=true WHERE id=?";
+        try(PreparedStatement updatePst = connection.prepareStatement(updateQuery)) {
+            updatePst.setInt(1, idNumber);
 
-            pst.executeUpdate();
+            updatePst.executeUpdate();
             System.out.println("즐겨찾기가 완료되었습니다.");
         } catch (Exception e){
             e.getStackTrace();
@@ -142,9 +142,9 @@ public class Main {
     public static void show(Connection connection, int aof, int user_id) {
         System.out.println("------------------------------------------------------------------");
         if(aof == 1){
-            String Ssql = "SELECT * FROM list WHERE user_id = "+user_id; // 쿼리문
-            try (PreparedStatement pst = connection.prepareStatement(Ssql);
-                 ResultSet rs = pst.executeQuery()) {
+            String selectionQuery = "SELECT * FROM list WHERE user_id = "+user_id; // 쿼리문
+            try (PreparedStatement selectionPst = connection.prepareStatement(selectionQuery);
+                 ResultSet rs = selectionPst.executeQuery()) {
 
                 while(rs.next()) {
                     int id = rs.getInt("id");
@@ -161,9 +161,9 @@ public class Main {
             }
         }
         if(aof == 2){
-            String FSsql = "SELECT * FROM list WHERE Cfavorite = true and user_id = "+user_id;
-            try(PreparedStatement pst2 = connection.prepareStatement(FSsql);
-                ResultSet rs = pst2.executeQuery()){
+            String selectFavoriteQuery = "SELECT * FROM list WHERE Cfavorite = true and user_id = "+user_id;
+            try(PreparedStatement selectFavoritePst = connection.prepareStatement(selectFavoriteQuery);
+                ResultSet rs = selectFavoritePst.executeQuery()){
 
                 while(rs.next()){
                     int id = rs.getInt("id");
@@ -184,11 +184,11 @@ public class Main {
     }
 
     public static void add(Connection connection, Scanner scan, int user_id) throws SQLException {
-        String none;
-        String Isql = "INSERT INTO list (Cname, Cdate, Cmemo, Cfavorite, user_id) VALUES (?, ?, ?, 0, ?)";
-        PreparedStatement pst = connection.prepareStatement(Isql);
+        String space;
+        String insertionQuery = "INSERT INTO list (Cname, Cdate, Cmemo, Cfavorite, user_id) VALUES (?, ?, ?, 0, ?)";
+        PreparedStatement pst = connection.prepareStatement(insertionQuery);
 
-        none = scan.nextLine();
+        space = scan.nextLine();
         System.out.print("자격증(상장) 명 ex)MosExcel : ");
         String Cn = scan.nextLine();
         System.out.print("취득 날짜 ex)2024.05.06 : ");
@@ -209,12 +209,12 @@ public class Main {
 
     public static void delete(Scanner scan, Connection connection){
         System.out.println("삭제할 번호를 입력하시오.");
-        int n = scan.nextInt();
+        int number = scan.nextInt();
 
-        String Esql = "DELETE FROM list WHERE id=?";
-        try (PreparedStatement pst = connection.prepareStatement(Esql)){
-            pst.setInt(1, n);
-            pst.executeUpdate();
+        String deleteQuery = "DELETE FROM list WHERE id=?";
+        try (PreparedStatement deletePst = connection.prepareStatement(deleteQuery)){
+            deletePst.setInt(1, number);
+            deletePst.executeUpdate();
         } catch (Exception e){
             e.getStackTrace();
         }
@@ -223,26 +223,26 @@ public class Main {
     }
 
     public static void update(Scanner scan, Connection connection) {
-        String none;
+        String space;
         System.out.print("수정할 번호를 입력하시오. ");
-        int id = scan.nextInt();
+        int updateNumber = scan.nextInt();
         System.out.print("새로운 자격증(상장) 명 : ");
-        none = scan.nextLine();
+        space = scan.nextLine();
         String nCn = scan.nextLine();
         System.out.print("새로운 취득 날짜 : ");
         String nCd = scan.nextLine();
         System.out.print("새로운 메모 : ");
         String nCm = scan.nextLine();
 
-        String Usql = "UPDATE list SET Cname=?, Cdate=?, Cmemo=? WHERE id=?";
-        try (PreparedStatement pst = connection.prepareStatement(Usql)) {
+        String updateQuery = "UPDATE list SET Cname=?, Cdate=?, Cmemo=? WHERE id=?";
+        try (PreparedStatement updatePst = connection.prepareStatement(updateQuery)) {
             ///System.out.println(nCn+nCd+nCm);
-            pst.setString(1, nCn);
-            pst.setString(2, nCd);
-            pst.setString(3, nCm);
-            pst.setInt(4, id);
+            updatePst.setString(1, nCn);
+            updatePst.setString(2, nCd);
+            updatePst.setString(3, nCm);
+            updatePst.setInt(4, updateNumber);
 
-            pst.executeUpdate();
+            updatePst.executeUpdate();
         } catch (Exception e){
             e.getStackTrace();
         }
