@@ -5,23 +5,28 @@ public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         String space;
+        int choice;
 
         // DB (mysql)
         String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
 
-        int choice, user_id = 0;
+        int user_id = 0;
 
         try {
             // JDBC 드라이버 로드
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, password);
 
+            System.out.println("***** AwardNote *****");
+
             System.out.println("1. 회원가입\n2. 로그인");
-            int choice = scan.nextInt();
+
             while(true) {
-                if (choice == 1) {
+                int choiceLogin = scan.nextInt();
+                if (choiceLogin != 1 && choiceLogin != 2 &&  choiceLogin != 3) System.out.println("잘못된 숫자입니다. 다시 입력하세요.");
+                if (choiceLogin == 1) {
                     String insertionQuery = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
                     String selectionQuery = "SELECT * FROM login WHERE username = ?";
                     try (PreparedStatement insertionPst = connection.prepareStatement(insertionQuery);
@@ -45,7 +50,7 @@ public class Main {
                         if (rs.next()) System.out.println("입력하신 회원은 이미 존재합니다.");
                         else {
                             insertionPst.executeUpdate();
-                            choice = 3;
+                            choiceLogin = 3;
                             System.out.println("회원가입이 완료되었습니다.");
                         }
 
@@ -55,10 +60,10 @@ public class Main {
                     }
                 }
 
-                if (choice == 2 || choice == 3) {
+                if (choiceLogin == 2 || choiceLogin == 3) {
                     String selectionQuery = "SELECT * FROM login WHERE username = ?";
 
-                    if (choice == 2) space = scan.nextLine();
+                    if (choiceLogin == 2) space = scan.nextLine();
                     System.out.print("아이디를 입력하세요 : ");
                     String username = scan.nextLine();
                     System.out.print("비밀번호를 입력하시오 : ");
@@ -87,14 +92,16 @@ public class Main {
                         e.getStackTrace();
                     }
 
-                    choice = 3;
+                    choiceLogin = 3;
                 }
             }
 
+            System.out.println("------------------------------------------------------------------");
+
             while (true) {
-                System.out.println("1. 등록\n2. 삭제\n3. 수정\n4. 목록 보기\n5. 나가기");
+                System.out.println("1. 등록\n2. 삭제\n3. 수정\n4. 목록 보기\n5. 검색\n6. 나가기");
                 choice = scan.nextInt();
-                if (choice == 5) break; // 나가기
+                if (choice == 6) break; // 나가기
 
                 if (choice == 1) { // 등록
                     add(connection, scan, user_id);
@@ -117,6 +124,8 @@ public class Main {
                     if(choice == 1) addFavorite(scan, connection);
                     if(choice == 2) show(connection, 2, user_id);
                 }
+                //if()
+
             }
         } catch (Exception e) {
             e.getStackTrace();
@@ -196,7 +205,6 @@ public class Main {
         System.out.print("메모 : ");
         String Cm = scan.nextLine();
 
-        // 값 바인딩
         pst.setString(1, Cn);
         pst.setString(2, Cd);
         pst.setString(3, Cm);
