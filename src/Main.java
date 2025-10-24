@@ -26,6 +26,7 @@ public class Main {
             while(true) {
                 int choiceLogin = scan.nextInt();
                 if (choiceLogin != 1 && choiceLogin != 2 &&  choiceLogin != 3) System.out.println("잘못된 숫자입니다. 다시 입력하세요.");
+
                 if (choiceLogin == 1) {
                     String insertionQuery = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
                     String selectionQuery = "SELECT * FROM login WHERE username = ?";
@@ -33,7 +34,7 @@ public class Main {
                          PreparedStatement selectionPst = connection.prepareStatement(selectionQuery)) {
 
                         System.out.print("이메일을 입력하세요 : ");
-                        space = scan.nextLine();
+                        scan.nextLine(); // enter 빼주기
                         String email = scan.nextLine();
                         System.out.print("아이디를 입력하세요 : ");
                         String username = scan.nextLine();
@@ -63,7 +64,7 @@ public class Main {
                 if (choiceLogin == 2 || choiceLogin == 3) {
                     String selectionQuery = "SELECT * FROM login WHERE username = ?";
 
-                    if (choiceLogin == 2) space = scan.nextLine();
+                    if (choiceLogin == 2) scan.nextLine(); // 공백 빼주기
                     System.out.print("아이디를 입력하세요 : ");
                     String username = scan.nextLine();
                     System.out.print("비밀번호를 입력하시오 : ");
@@ -124,7 +125,7 @@ public class Main {
                     if(choice == 1) addFavorite(scan, connection);
                     if(choice == 2) show(connection, 2, user_id);
                 }
-                //if()
+                //if() // 검색하기
 
             }
         } catch (Exception e) {
@@ -137,7 +138,7 @@ public class Main {
         System.out.println("즐겨찾기 할 번호를 입력하세요.");
         int idNumber = scan.nextInt();
 
-        String updateQuery = "UPDATE list SET Cfavorite=true WHERE id=?";
+        String updateQuery = "UPDATE list SET isFavorite=true WHERE id=?";
         try(PreparedStatement updatePst = connection.prepareStatement(updateQuery)) {
             updatePst.setInt(1, idNumber);
 
@@ -157,32 +158,32 @@ public class Main {
 
                 while(rs.next()) {
                     int id = rs.getInt("id");
-                    String Cn = rs.getString("Cname");
-                    String Cd = rs.getString("Cdate");
-                    String Cm = rs.getString("Cmemo");
+                    String CertificationName = rs.getString("CertificationName");
+                    String CertificationDate = rs.getString("CertificationDate");
+                    String CertificationMemo = rs.getString("CertificationMemo");
                     System.out.println(id);
-                    System.out.println("자격증(상장) 명 : " + Cn);
-                    System.out.println("취득 날짜 : " + Cd);
-                    System.out.println("메모 : " + Cm);
+                    System.out.println("자격증(상장) 명 : " + CertificationName);
+                    System.out.println("취득 날짜 : " + CertificationDate);
+                    System.out.println("메모 : " + CertificationMemo);
                 }
             } catch (Exception e) {
                 e.getStackTrace();
             }
         }
         if(aof == 2){
-            String selectFavoriteQuery = "SELECT * FROM list WHERE Cfavorite = true and user_id = "+user_id;
+            String selectFavoriteQuery = "SELECT * FROM list WHERE isFavorite = true and user_id = "+user_id;
             try(PreparedStatement selectFavoritePst = connection.prepareStatement(selectFavoriteQuery);
                 ResultSet rs = selectFavoritePst.executeQuery()){
 
                 while(rs.next()){
                     int id = rs.getInt("id");
-                    String Cn = rs.getString("Cname");
-                    String Cd = rs.getString("Cdate");
-                    String Cm = rs.getString("Cmemo");
+                    String CertificationName = rs.getString("CertificationName");
+                    String CertificationDate = rs.getString("CertificationDate");
+                    String CertificationMemo = rs.getString("CertificationMemo");
                     System.out.println(id);
-                    System.out.println("자격증(상장) 명 : " + Cn);
-                    System.out.println("취득 날짜 : " + Cd);
-                    System.out.println("메모 : " + Cm);
+                    System.out.println("자격증(상장) 명 : " + CertificationName);
+                    System.out.println("취득 날짜 : " + CertificationDate);
+                    System.out.println("메모 : " + CertificationMemo);
                 }
 
             } catch (Exception e){
@@ -193,21 +194,20 @@ public class Main {
     }
 
     public static void add(Connection connection, Scanner scan, int user_id) throws SQLException {
-        String space;
-        String insertionQuery = "INSERT INTO list (Cname, Cdate, Cmemo, Cfavorite, user_id) VALUES (?, ?, ?, 0, ?)";
+        String insertionQuery = "INSERT INTO list (CertificationName, CertificationDate, CertificationMemo, isFavorite, user_id) VALUES (?, ?, ?, 0, ?)";
         PreparedStatement pst = connection.prepareStatement(insertionQuery);
 
-        space = scan.nextLine();
+        scan.nextLine(); // 공백 빼주기
         System.out.print("자격증(상장) 명 ex)MosExcel : ");
-        String Cn = scan.nextLine();
+        String CertificationName = scan.nextLine();
         System.out.print("취득 날짜 ex)2024.05.06 : ");
-        String Cd = scan.nextLine();
+        String CertificationDate = scan.nextLine();
         System.out.print("메모 : ");
-        String Cm = scan.nextLine();
+        String CertificationMemo = scan.nextLine();
 
-        pst.setString(1, Cn);
-        pst.setString(2, Cd);
-        pst.setString(3, Cm);
+        pst.setString(1, CertificationName);
+        pst.setString(2, CertificationDate);
+        pst.setString(3, CertificationMemo);
         pst.setInt(4, user_id);
 
         pst.executeUpdate(); // 실행
@@ -231,23 +231,23 @@ public class Main {
     }
 
     public static void update(Scanner scan, Connection connection) {
-        String space;
+
         System.out.print("수정할 번호를 입력하시오. ");
         int updateNumber = scan.nextInt();
         System.out.print("새로운 자격증(상장) 명 : ");
-        space = scan.nextLine();
-        String nCn = scan.nextLine();
+        scan.nextLine(); // 공백 빼주기
+        String newCertificationName = scan.nextLine();
         System.out.print("새로운 취득 날짜 : ");
-        String nCd = scan.nextLine();
+        String newCertificationDate = scan.nextLine();
         System.out.print("새로운 메모 : ");
-        String nCm = scan.nextLine();
+        String newCertificationMemo = scan.nextLine();
 
-        String updateQuery = "UPDATE list SET Cname=?, Cdate=?, Cmemo=? WHERE id=?";
+        String updateQuery = "UPDATE list SET CertificationName=?, CertificationDate=?, CertificationMemo=? WHERE id=?";
         try (PreparedStatement updatePst = connection.prepareStatement(updateQuery)) {
             ///System.out.println(nCn+nCd+nCm);
-            updatePst.setString(1, nCn);
-            updatePst.setString(2, nCd);
-            updatePst.setString(3, nCm);
+            updatePst.setString(1, newCertificationName);
+            updatePst.setString(2, newCertificationDate);
+            updatePst.setString(3, newCertificationMemo);
             updatePst.setInt(4, updateNumber);
 
             updatePst.executeUpdate();
