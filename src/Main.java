@@ -4,13 +4,13 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        String space;
         int choice;
 
         // DB (mysql)
         String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
+        int restart = 0;
 
         int user_id = 0;
 
@@ -25,7 +25,7 @@ public class Main {
 
             while(true) {
                 int choiceLogin = scan.nextInt();
-                if (choiceLogin != 1 && choiceLogin != 2 &&  choiceLogin != 3) System.out.println("잘못된 숫자입니다. 다시 입력하세요.");
+                if (choiceLogin != 1 && choiceLogin != 2 && choiceLogin != 3) System.out.println("잘못된 숫자입니다. 다시 입력하세요.");
 
                 if (choiceLogin == 1) {
                     String insertionQuery = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
@@ -48,7 +48,10 @@ public class Main {
 
                         ResultSet rs = selectionPst.executeQuery();
 
-                        if (rs.next()) System.out.println("입력하신 회원은 이미 존재합니다.");
+                        if (rs.next()){
+                            System.out.println("입력하신 회원은 이미 존재합니다.");
+                            continue;
+                        }
                         else {
                             insertionPst.executeUpdate();
                             choiceLogin = 3;
