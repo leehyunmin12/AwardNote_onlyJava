@@ -10,9 +10,7 @@ public class Main {
         String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
-        int restart = 0;
-
-        int user_id = 0;
+        int user_id = 0;;
 
         try {
             // JDBC 드라이버 로드
@@ -22,8 +20,9 @@ public class Main {
             System.out.println("***** AwardNote *****");
 
             System.out.println("1. 회원가입\n2. 로그인");
+            System.out.print(">> ");
 
-            while(true) {
+            while (true) {
                 int choiceLogin = scan.nextInt();
                 if (choiceLogin != 1 && choiceLogin != 2 && choiceLogin != 3) System.out.println("잘못된 숫자입니다. 다시 입력하세요.");
 
@@ -49,7 +48,9 @@ public class Main {
                         ResultSet rs = selectionPst.executeQuery();
 
                         if (rs.next()){
-                            System.out.println("입력하신 회원은 이미 존재합니다.");
+                            System.out.println("입력하신 회원은 이미 존재합니다. 다시 입력해 주세요.");
+                            System.out.println("1. 회원가입\n2. 로그인");
+                            System.out.print(">> ");
                             continue;
                         }
                         else {
@@ -79,7 +80,10 @@ public class Main {
                         ResultSet rs = pst.executeQuery();
 
                         if (!rs.next()) {
-                            System.out.println("입력하신 아이디는 존재하지 않습니다.");
+                            System.out.println("입력하신 아이디는 존재하지 않습니다. 다시 입력해 주세요.");
+                            System.out.println("1. 회원가입\n2. 로그인");
+                            System.out.print(">> ");
+                            continue;
                         } else {
                             if (pw.equals(rs.getString("password"))) {
                                 user_id = rs.getInt("id");
@@ -104,6 +108,7 @@ public class Main {
 
             while (true) {
                 System.out.println("1. 등록\n2. 삭제\n3. 수정\n4. 목록 보기\n5. 검색\n6. 나가기");
+                System.out.print(">> ");
                 choice = scan.nextInt();
                 if (choice == 6) break; // 나가기
 
@@ -124,6 +129,7 @@ public class Main {
                 if (choice == 4) { // 목록 보기
                     show(connection, 1, user_id);
                     System.out.println("즐겨찾기를 설정하고 싶으면 1\n즐겨찾기 목록을 보고싶다면 2\n아니면 3을 입력하세요");
+                    System.out.print(">> ");
                     choice = scan.nextInt();
                     if(choice == 1) addFavorite(scan, connection);
                     if(choice == 2) show(connection, 2, user_id);
@@ -154,11 +160,14 @@ public class Main {
 
     public static void show(Connection connection, int aof, int user_id) {
         System.out.println("------------------------------------------------------------------");
+        System.out.println("                           <목록>                                  ");
+        System.out.println("------------------------------------------------------------------");
         if(aof == 1){
             String selectionQuery = "SELECT * FROM list WHERE user_id = "+user_id; // 쿼리문
             try (PreparedStatement selectionPst = connection.prepareStatement(selectionQuery);
                  ResultSet rs = selectionPst.executeQuery()) {
 
+                if(!rs.next()) System.out.println("                      목록이 비어 있습니다.");
                 while(rs.next()) {
                     int id = rs.getInt("id");
                     String CertificationName = rs.getString("CertificationName");
