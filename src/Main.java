@@ -117,22 +117,17 @@ public class Main {
                 }
 
                 if (choice == 2) { // 삭제
-                    show(connection, 1, user_id);
+                    show(connection,  user_id, scan, 1);
                     delete(scan, connection);
                 }
 
                 if (choice == 3) { // 수정
-                    show(connection, 1, user_id);
+                    show(connection, user_id, scan, 1);
                     update(scan, connection);
                 }
 
                 if (choice == 4) { // 목록 보기
-                    show(connection, 1, user_id);
-                    System.out.println("즐겨찾기를 설정하고 싶으면 1\n즐겨찾기 목록을 보고싶다면 2\n아니면 3을 입력하세요");
-                    System.out.print(">> ");
-                    choice = scan.nextInt();
-                    if(choice == 1) addFavorite(scan, connection);
-                    if(choice == 2) show(connection, 2, user_id);
+                    show(connection, user_id, scan, 0);
                 }
                 if(choice == 5) { // 검색하기
                     select(scan, connection, user_id);
@@ -146,28 +141,35 @@ public class Main {
     }
 
     private static void select(Scanner scan, Connection connection,  int user_id) {
+        int cnt = 0;
+
         scan.nextLine();
         System.out.print("검색할 자격증 명 : ");
         String selectCertificationName = scan.nextLine();
 
-        String selectQuery = "SELECT * FROM list WHERE user_id =" + user_id + " and CertificationName like"+"'%"+selectCertificationName+"%'";
+        String selectQuery = "SELECT * FROM list WHERE user_id = " + user_id + " and CertificationName like ?";
+        String param = "%" + selectCertificationName + "%";
+        // System.out.println(selectQuery);
+
         try (PreparedStatement selectPst = connection.prepareStatement(selectQuery)){
+            selectPst.setString(1, param);
             ResultSet rs = selectPst.executeQuery();
 
-            if(!rs.next()) System.out.println("------------------------------------------------------------------\n일치하는 결과값이 없습니다.");
-            else{
                 System.out.println("------------------------------------------------------------------");
                 System.out.println("                           <검색된 결과 값>                         ");
                 System.out.println("------------------------------------------------------------------");
-                while( rs.next() ) {
+                while (rs.next()) {
                     int id = rs.getInt("id");
                     String CertificationName = rs.getString("CertificationName");
                     String CertificationDate = rs.getString("CertificationDate");
                     System.out.println(id);
                     System.out.println("자격증 명 : "+CertificationName);
                     System.out.println("취득날짜 : "+CertificationDate);
+                    cnt = 1;
                 }
-            }
+
+            if(cnt == 0) System.out.println("                      일치하는 결과 값이 없습니다.");
+
             System.out.println("------------------------------------------------------------------");
         } catch (Exception e) {
             e.getStackTrace();
@@ -189,16 +191,16 @@ public class Main {
         }
     }
 
-    public static void show(Connection connection, int aof, int user_id) {
+    public static void show(Connection connection, int user_id, Scanner scan, int aof) {
+        int cnt = 0;
         System.out.println("------------------------------------------------------------------");
         System.out.println("                           <목록>                                  ");
         System.out.println("------------------------------------------------------------------");
-        if(aof == 1){
+
             String selectionQuery = "SELECT * FROM list WHERE user_id = "+user_id; // 쿼리문
             try (PreparedStatement selectionPst = connection.prepareStatement(selectionQuery);
                  ResultSet rs = selectionPst.executeQuery()) {
 
-                if(!rs.next()) System.out.println("                      목록이 비어 있습니다.");
                 while(rs.next()) {
                     int id = rs.getInt("id");
                     String CertificationName = rs.getString("CertificationName");
@@ -208,32 +210,47 @@ public class Main {
                     System.out.println("자격증(상장) 명 : " + CertificationName);
                     System.out.println("취득 날짜 : " + CertificationDate);
                     System.out.println("메모 : " + CertificationMemo);
+                    cnt = 1;
                 }
+                if (cnt == 0) System.out.println("                      목록이 비어 있습니다.");
+
             } catch (Exception e) {
                 e.getStackTrace();
             }
-        }
-        if(aof == 2){
-            String selectFavoriteQuery = "SELECT * FROM list WHERE isFavorite = true and user_id = "+user_id;
-            try(PreparedStatement selectFavoritePst = connection.prepareStatement(selectFavoriteQuery);
-                ResultSet rs = selectFavoritePst.executeQuery()){
+        System.out.println("------------------------------------------------------------------");
+        //
+        if (cnt == 1 && aof != 1) {
+            System.out.println("즐겨찾기를 설정하고 싶으면 1\n즐겨찾기 목록을 보고싶다면 2\n아니면 3을 입력하세요");
+            System.out.print(">> ");
+            int choice = scan.nextInt();
 
-                while(rs.next()){
-                    int id = rs.getInt("id");
-                    String CertificationName = rs.getString("CertificationName");
-                    String CertificationDate = rs.getString("CertificationDate");
-                    String CertificationMemo = rs.getString("CertificationMemo");
-                    System.out.println(id);
-                    System.out.println("자격증(상장) 명 : " + CertificationName);
-                    System.out.println("취득 날짜 : " + CertificationDate);
-                    System.out.println("메모 : " + CertificationMemo);
+            if (choice == 1) addFavorite(scan, connection);
+            if (choice == 2) {
+                System.out.println("------------------------------------------------------------------");
+                System.out.println("                           <즐겨찾기 목록>                          ");
+                System.out.println("------------------------------------------------------------------");
+
+                String selectFavoriteQuery = "SELECT * FROM list WHERE isFavorite = true and user_id = " + user_id;
+                try (PreparedStatement selectFavoritePst = connection.prepareStatement(selectFavoriteQuery);
+                     ResultSet rs = selectFavoritePst.executeQuery()) {
+
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        String CertificationName = rs.getString("CertificationName");
+                        String CertificationDate = rs.getString("CertificationDate");
+                        String CertificationMemo = rs.getString("CertificationMemo");
+                        System.out.println(id);
+                        System.out.println("자격증(상장) 명 : " + CertificationName);
+                        System.out.println("취득 날짜 : " + CertificationDate);
+                        System.out.println("메모 : " + CertificationMemo);
+                    }
+                    System.out.println("------------------------------------------------------------------");
+
+                } catch (Exception e) {
+                    e.getStackTrace();
                 }
-
-            } catch (Exception e){
-                e.getStackTrace();
             }
         }
-        System.out.println("------------------------------------------------------------------");
     }
 
     public static void add(Connection connection, Scanner scan, int user_id) throws SQLException {
@@ -259,7 +276,7 @@ public class Main {
     }
 
     public static void delete(Scanner scan, Connection connection){
-        System.out.println("삭제할 번호를 입력하시오.");
+        System.out.print("삭제할 번호를 입력하시오 : ");
         int number = scan.nextInt();
 
         String deleteQuery = "DELETE FROM list WHERE id=?";
@@ -275,7 +292,7 @@ public class Main {
 
     public static void update(Scanner scan, Connection connection) {
 
-        System.out.print("수정할 번호를 입력하시오. ");
+        System.out.print("수정할 번호를 입력하시오 : ");
         int updateNumber = scan.nextInt();
         System.out.print("새로운 자격증(상장) 명 : ");
         scan.nextLine(); // 공백 빼주기
