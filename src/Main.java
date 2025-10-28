@@ -10,7 +10,7 @@ public class Main {
         String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
         String user = "root";
         String password = "leehm2292!"; // DB 비밀번호
-        int user_id = 0;;
+        int user_id = 0;
 
         try {
             // JDBC 드라이버 로드
@@ -134,7 +134,34 @@ public class Main {
                     if(choice == 1) addFavorite(scan, connection);
                     if(choice == 2) show(connection, 2, user_id);
                 }
-                //if() // 검색하기
+                if(choice == 5) { // 검색하기
+                    scan.nextLine();
+                    System.out.print("자격증 명 : ");
+                    String findCertificationName = scan.nextLine();
+
+                    String selectQuery = "SELECT * FROM list WHERE CertificationName like"+"'%"+findCertificationName+"%'";
+                    try (PreparedStatement selectPst = connection.prepareStatement(selectQuery)){
+                        ResultSet rs = selectPst.executeQuery();
+
+                        if(!rs.next()) System.out.println("------------------------------------------------------------------\n일치하는 결과값이 없습니다.");
+                        else{
+                            System.out.println("------------------------------------------------------------------");
+                            System.out.println("                           <검색된 결과 값>                         ");
+                            System.out.println("------------------------------------------------------------------");
+                            while(rs.next()) {
+                                int id = rs.getInt("id");
+                                String CertificationName = rs.getString("CertificationName");
+                                String CertificationDate = rs.getString("CertificationDate");
+                                System.out.println(id);
+                                System.out.println("자격증 명 : "+CertificationName);
+                                System.out.println("취득날짜 : "+CertificationDate);
+                            }
+                        }
+                        System.out.println("------------------------------------------------------------------");
+                    } catch (Exception e) {
+                        e.getStackTrace();
+                    }
+                }
 
             }
         } catch (Exception e) {
