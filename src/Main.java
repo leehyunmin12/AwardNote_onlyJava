@@ -135,32 +135,7 @@ public class Main {
                     if(choice == 2) show(connection, 2, user_id);
                 }
                 if(choice == 5) { // 검색하기
-                    scan.nextLine();
-                    System.out.print("자격증 명 : ");
-                    String findCertificationName = scan.nextLine();
-
-                    String selectQuery = "SELECT * FROM list WHERE CertificationName like"+"'%"+findCertificationName+"%'";
-                    try (PreparedStatement selectPst = connection.prepareStatement(selectQuery)){
-                        ResultSet rs = selectPst.executeQuery();
-
-                        if(!rs.next()) System.out.println("------------------------------------------------------------------\n일치하는 결과값이 없습니다.");
-                        else{
-                            System.out.println("------------------------------------------------------------------");
-                            System.out.println("                           <검색된 결과 값>                         ");
-                            System.out.println("------------------------------------------------------------------");
-                            while(rs.next()) {
-                                int id = rs.getInt("id");
-                                String CertificationName = rs.getString("CertificationName");
-                                String CertificationDate = rs.getString("CertificationDate");
-                                System.out.println(id);
-                                System.out.println("자격증 명 : "+CertificationName);
-                                System.out.println("취득날짜 : "+CertificationDate);
-                            }
-                        }
-                        System.out.println("------------------------------------------------------------------");
-                    } catch (Exception e) {
-                        e.getStackTrace();
-                    }
+                    select(scan, connection, user_id);
                 }
 
             }
@@ -170,8 +145,37 @@ public class Main {
 
     }
 
+    private static void select(Scanner scan, Connection connection,  int user_id) {
+        scan.nextLine();
+        System.out.print("검색할 자격증 명 : ");
+        String selectCertificationName = scan.nextLine();
+
+        String selectQuery = "SELECT * FROM list WHERE user_id =" + user_id + " and CertificationName like"+"'%"+selectCertificationName+"%'";
+        try (PreparedStatement selectPst = connection.prepareStatement(selectQuery)){
+            ResultSet rs = selectPst.executeQuery();
+
+            if(!rs.next()) System.out.println("------------------------------------------------------------------\n일치하는 결과값이 없습니다.");
+            else{
+                System.out.println("------------------------------------------------------------------");
+                System.out.println("                           <검색된 결과 값>                         ");
+                System.out.println("------------------------------------------------------------------");
+                while( rs.next() ) {
+                    int id = rs.getInt("id");
+                    String CertificationName = rs.getString("CertificationName");
+                    String CertificationDate = rs.getString("CertificationDate");
+                    System.out.println(id);
+                    System.out.println("자격증 명 : "+CertificationName);
+                    System.out.println("취득날짜 : "+CertificationDate);
+                }
+            }
+            System.out.println("------------------------------------------------------------------");
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+    }
+
     private static void addFavorite(Scanner scan, Connection connection) {
-        System.out.println("즐겨찾기 할 번호를 입력하세요.");
+        System.out.println("즐겨찾기 할 번호를 입력하세요 : ");
         int idNumber = scan.nextInt();
 
         String updateQuery = "UPDATE list SET isFavorite=true WHERE id=?";
