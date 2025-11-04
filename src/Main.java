@@ -177,7 +177,7 @@ public class Main {
     }
 
     private static void addFavorite(Scanner scan, Connection connection) {
-        System.out.println("즐겨찾기 할 번호를 입력하세요 : ");
+        System.out.print("즐겨찾기 할 번호를 입력하세요 : ");
         int idNumber = scan.nextInt();
 
         String updateQuery = "UPDATE list SET isFavorite=true WHERE id=?";
