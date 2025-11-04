@@ -8,7 +8,7 @@ public class DBManager {
 
     public DBManager() throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection = DriverManager.getConnection(url, user, password);
+        connection = DriverManager.getConnection(url, user, password);
     }
 
     public Connection getConnection() { return connection; }

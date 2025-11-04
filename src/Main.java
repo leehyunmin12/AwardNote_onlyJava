@@ -2,21 +2,14 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Scanner scan = new Scanner(System.in);
-        int choice;
+        int choice, user_id = 0;;
 
-        // DB (mysql)
-        String url = "jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul";
-        String user = "root";
-        String password = "leehm2292!"; // DB 비밀번호
-        int user_id = 0;
+        DBManager dbManager = new DBManager();
+        Connection connection = dbManager.getConnection();
 
         try {
-            // JDBC 드라이버 로드
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, password);
-
             System.out.println("***** AwardNote *****");
 
             System.out.println("1. 회원가입\n2. 로그인");
@@ -61,6 +54,7 @@ public class Main {
 
                     } catch (Exception e) {
                         System.out.println("회원가입을 실패하였습니다.");
+                        System.out.println(e);
                         e.getStackTrace();
                     }
                 }
