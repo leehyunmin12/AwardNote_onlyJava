@@ -17,7 +17,6 @@ public class Service {
     public void select() {
         int cnt = 0;
 
-        scan.nextLine();
         System.out.print("검색할 자격증 명 : ");
         String selectCertificationName = scan.nextLine();
 
@@ -99,8 +98,9 @@ public class Service {
             System.out.println("즐겨찾기를 설정하고 싶으면 1\n즐겨찾기 목록을 보고싶다면 2\n아니면 3을 입력하세요");
             System.out.print(">> ");
             int choice = scan.nextInt();
+            scan.nextLine();
 
-            if (choice == 1) addFavorite(scan, connection);
+            if (choice == 1) this.addFavorite(scan, connection);
             if (choice == 2) {
                 System.out.println("------------------------------------------------------------------");
                 System.out.println("                           <즐겨찾기 목록>                          ");
@@ -131,8 +131,8 @@ public class Service {
 
     public void add() {
         String insertionQuery = "INSERT INTO list (CertificationName, CertificationDate, CertificationMemo, isFavorite, user_id) VALUES (?, ?, ?, 0, ?)";
+
         try(PreparedStatement pst = connection.prepareStatement(insertionQuery)){
-            scan.nextLine(); // 공백 빼주기
             System.out.print("자격증(상장) 명 ex)MosExcel : ");
             String CertificationName = scan.nextLine();
             System.out.print("취득 날짜 ex)2024.05.06 : ");
@@ -156,6 +156,7 @@ public class Service {
     public void delete(){
         System.out.print("삭제할 번호를 입력하시오 : ");
         int number = scan.nextInt();
+        scan.nextLine();
 
         String deleteQuery = "DELETE FROM list WHERE id=?";
         try (PreparedStatement deletePst = connection.prepareStatement(deleteQuery)){
@@ -172,8 +173,9 @@ public class Service {
 
         System.out.print("수정할 번호를 입력하시오 : ");
         int updateNumber = scan.nextInt();
-        System.out.print("새로운 자격증(상장) 명 : ");
         scan.nextLine(); // 공백 빼주기
+
+        System.out.print("새로운 자격증(상장) 명 : ");
         String newCertificationName = scan.nextLine();
         System.out.print("새로운 취득 날짜 : ");
         String newCertificationDate = scan.nextLine();

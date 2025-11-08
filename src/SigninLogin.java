@@ -79,7 +79,6 @@ public class SigninLogin {
                         if (pw.equals(rs.getString("password"))) {
                             user_id = rs.getInt("id");
                             System.out.println("로그인이 완료되었습니다.");
-                            User user1 = new User(rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getString("email"));
                             return user_id;
                         } else {
                             System.out.println("비밀번호가 알맞지 않습니다.");
