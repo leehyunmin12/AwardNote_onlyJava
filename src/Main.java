@@ -2,11 +2,9 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         int choice;
-
-        DBManager dbManager = new DBManager();
 
         try {
             System.out.println("***** AwardNote *****");
@@ -28,27 +26,14 @@ public class Main {
                 choice = scan.nextInt();
                 scan.nextLine();
 
-                if (choice == 6) break; // 나가기
-
-                if (choice == 1) { // 등록
-                    service.add();
-                }
-
-                if (choice == 2) { // 삭제
-                    service.show(1);
-                    service.delete();
-                }
-
-                if (choice == 3) { // 수정
-                    service.show(1);
-                    service.update();
-                }
-
-                if (choice == 4) { // 목록 보기
-                    service.show(0);
-                }
-                if (choice == 5) { // 검색하기
-                    service.select();
+                switch (choice){
+                    case 6: System.exit(0); // 종료
+                    case 1: service.add(); break;
+                    case 2: service.show(1); service.delete(); break;
+                    case 3: service.show(1); service.update(); break;
+                    case 4: service.show(0); break;
+                    case 5: service.select(); break;
+                    default: System.out.println("잘못된 입력입니다. 다시 입력하세요");
                 }
             }
 
